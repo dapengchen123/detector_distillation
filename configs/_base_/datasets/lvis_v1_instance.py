@@ -1,4 +1,5 @@
 # dataset settings
+_base_ = 'coco_instance.py'
 dataset_type = 'LVISV1Dataset'
 data_root = 'data/lvis_v1/'
 img_norm_cfg = dict(
@@ -59,7 +60,9 @@ data = dict(
     test=dict(
         type=dataset_type,
         ann_file=data_root + 'annotations/lvis_v1_val.json',
+        # proposal_file=data_root + 'proposals/rpn_r50_fpn_lvis_val_soco.pkl',
         proposal_file=data_root + 'proposals/rpn_r101_fpn_lvis_val.pkl',
         img_prefix=data_root,
         pipeline=test_pipeline))
-evaluation = dict(interval=4, metric=['bbox', 'segm'])
+evaluation = dict(interval=4,metric=['bbox', 'segm'])
+# evaluation = dict(metric=['bbox'])

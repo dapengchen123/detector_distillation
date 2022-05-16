@@ -1,12 +1,12 @@
 _base_ = [
     '../_base_/models/cascade_mask_rcnn_r50_fpn.py',
     '../_base_/datasets/lvis_v1_instance.py',
-    '../_base_/schedules/schedule_1x.py',
-    '../_base_/default_runtime.py'
+    '../_base_/schedules/schedule_1x.py', '../_base_/default_runtime.py'
 ]
 dataset_type = 'LVISV1Dataset'
 data_root = 'data/lvis_v1/'
 optimizer = dict(type='SGD', lr=0.005, momentum=0.9, weight_decay=0.000025)
+# evaluation = dict(type="SubModulesDistEvalHook", interval=4000)
 evaluation = dict(interval=2,metric=['bbox', 'segm'])
 model = dict(
     pretrained='open-mmlab://detectron2/resnet50_caffe',
@@ -87,6 +87,23 @@ model = dict(
                     loss_weight=1.0),
                 loss_bbox=dict(type='SmoothL1Loss', beta=1.0, loss_weight=1.0))
         ],
+        # bbox_head=dict(
+        #     type='Shared4Conv1FCBBoxHead',
+        #     in_channels=256,
+        #     ensemble=False,
+        #     fc_out_channels=1024,
+        #     roi_feat_size=7,
+        #     with_cls=False,
+        #     num_classes=1203,
+        #     norm_cfg=dict(type='SyncBN', requires_grad=True),
+        #     bbox_coder=dict(
+        #         type='DeltaXYWHBBoxCoder',
+        #         target_means=[0., 0., 0., 0.],
+        #         target_stds=[0.1, 0.1, 0.2, 0.2]),
+        #     reg_class_agnostic=True,
+        #     loss_cls=dict(
+        #         type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0),
+        #     loss_bbox=dict(type='L1Loss', loss_weight=1.0)),
         mask_head=dict(num_classes=1203)))
 train_cfg = dict(
     rpn_proposal=dict(
@@ -159,5 +176,6 @@ data = dict(
     # train=dict(pipeline=train_pipeline))
     train=dict(dataset=dict(pipeline=train_pipeline)),
     val=dict(pipeline=test_pipeline),
-    test=dict(pipeline=test_pipeline)
-)
+    test=dict(pipeline=test_pipeline))
+# fp16 = dict(loss_scale=512.)
+# checkpoint_config = dict(by_epoch=False, interval=100, max_keep_ckpts=40)
